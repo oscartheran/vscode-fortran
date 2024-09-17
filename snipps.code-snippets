@@ -1,34 +1,36 @@
 {
 	"Header": {
-		"prefix" : "hdr",
-		"body":[
+		"prefix": "hdr",
+		"body": [
 			"$LINE_COMMENT ==============================================================",
 			"! $1",
 			"$LINE_COMMENT --------------------------------------------------------------",
 			"$0"
 		]
-	}, 
+	},
 	"Cite Michelsen-Møllerup": {
-		"prefix" : "mm",
-		"body":[
+		"prefix": "mm",
+		"body": [
 			"Thermodynamic Models: Fundamental and Computational Aspects, Michael L.",
-   			"!! Michelsen, Jørgen M. Mollerup. Tie-Line Publications, Denmark (2004)",
-   			"!! [doi](http://dx.doi.org/10.1016/j.fluid.2005.11.032)",
-		 ]
-	}, 
+			"!! Michelsen, Jørgen M. Mollerup. Tie-Line Publications, Denmark (2004)",
+			"!! [doi](http://dx.doi.org/10.1016/j.fluid.2005.11.032)",
+		]
+	},
 	"Use yaeos": {
-        "scope": ["FortranFreeForm", "FortranFixedForm"],
-		"prefix":"usy",
-		"body": ["use yaeos__$1"]
+		"scope": "[FortranFreeForm]",
+		"prefix": "usy",
+		"body": [
+			"use yaeos__$1"
+		]
 	},
 	"Documentation": {
-        "scope": ["FortranFreeForm", "FortranFixedForm"],
+		"scope": "[FortranFxedForm]",
 		"prefix": "doc",
 		"body": [
 			"!! # ${1:Title}",
 			"!! ${2:Simple description}",
 			"!!",
-            "!! # Description",
+			"!! # Description",
 			"!! ${3:Detailed description}",
 			"!!",
 			"!! # Examples",
@@ -43,31 +45,33 @@
 		"description": "Documentation template",
 	},
 	"Hyperdual-based ArModel": {
-        "scope": ["FortranFreeForm", "FortranFixedForm"],
-		"prefix":"hdar",
-		"body":[
-			"module yaeos__${1:model_name}",
-			"   use yaeos, only: pr, R, ArModelAdiff, hyperdual",
+		"scope": "[FortranFreeForm]",
+		"prefix": "hdar",
+		"body": [
+			"module yaeos__${1:ModelName}",
+			"   use yaeos, only: pr, R",
+			"   use yaeos__autodiff",
 			"",
-			"   type, extends(ArModelAdiff) :: $1",
-			"      ${2: parameters$}",
+			"   type, extends(ArModelAdiff) :: ${1:ModelName}",
+			"      ${2:ModelParameters}",
 			"   contains",
-			"      procedure :: Ar => arfun",
-			"      procedure get_v0 => v0",
-			"   end type",
+			"      procedure :: Ar => Ar",
+			"      procedure :: get_v0 => v0",
+			"   end type ${1:ModelName}",
+			"",
 			"contains",
-			"   subroutine arfun(model, n, V, T, Ar)",
-			"      class($1), intent(in) :: model !! Model",
+			"   ",
+			"   type(hyperdual) function Ar(self, n, V, T)",
+			"      class(${1:ModelName}) :: self !! Model",
 			"      type(hyperdual), intent(in) :: n(:) !! Number of moles vector",
 			"      type(hyperdual), intent(in) :: V !! Volume [L/mol]",
 			"      type(hyperdual), intent(in) :: T !! Temperature [K]",
-			"      type(hyperdual), intent(out) :: Ar !! Residual Helmholtz energy",
 			"",
-			"         ${3: Ar expresion}",
-			"   end subroutine",
+			"      Ar = Ar function here",
+			"   end function Ar",
 			"",
 			"   function v0(self, n, P, T)",
-			"      class($1), intent(in) :: self !! Model",
+			"      class(${1:ModelName}), intent(in) :: self !! Model",
 			"      real(pr), intent(in) :: n(:) !! Moles vector",
 			"      real(pr), intent(in) :: P !! Pressure [bar]",
 			"      real(pr), intent(in) :: T !! Temperature [K]",
@@ -75,14 +79,13 @@
 			"",
 			"      v0 = 0.001_pr",
 			"   end function v0",
-			"end module $1",
-
+			"end module yaeos__${1:ModelName}",
 		]
 	},
 	"FittingProblem": {
-        "scope": ["FortranFreeForm", "FortranFixedForm"],
-		"prefix":"fp",
-		"body":[
+		"scope": "[FortranFreeForm]",
+		"prefix": "fp",
+		"body": [
 			"module yaeos__fitting_$1",
 			"   use yaeos, only: pr, ArModel, GeModel",
 			"   use yaeos__fitting, only: FittingProblem",
@@ -102,12 +105,10 @@
 			"   end function",
 			"end module",
 		]
-
-
 	},
-	"nlopt":{
-		"scope": ["FortranFreeForm", "FortranFixedForm"],
-		"prefix":"nlopt",
+	"nlopt": {
+		"scope": "[FortranFreeForm]",
+		"prefix": "nlopt",
 		"body": [
 			"real(pr) function fobj(x, gradient, func_data)",
 			"   real(pr), intent(in out) :: x(:)",
@@ -118,8 +119,8 @@
 			"end function",
 			"",
 			"real(pr) function optimize(X, func_data) result(y)",
-            "   use nlopt_wrap, only: create, destroy, nlopt_opt, nlopt_algorithm_enum",
-            "   use nlopt_callback, only: nlopt_func, create_nlopt_func",
+			"   use nlopt_wrap, only: create, destroy, nlopt_opt, nlopt_algorithm_enum",
+			"   use nlopt_callback, only: nlopt_func, create_nlopt_func",
 			"   real(pr), intent(in) :: X(:)",
 			"   class(*), intent(in), optional :: func_data",
 			"",
@@ -129,33 +130,30 @@
 			"",
 			"   f = create_nlopt_func(fobj, f_data=func_data)",
 			"   opt = create(nlopt_algorithm_enum%NELDER_MEAD, size(X))",
-            "   call opt%set_min_objective(f)",
-            "   call opt%optimize(x, y, stat)",
+			"   call opt%set_min_objective(f)",
+			"   call opt%optimize(x, y, stat)",
 		]
 	},
-	"Legacy Makefile":{
+	"Legacy Makefile": {
 		"prefix": "makeleg",
 		"body": [
-		"# Makefile for legact Fortran project",
-		"# Replace the files names with CAPS (and their extension) with your files",
-		"FC=ifort -g -extend-source",
-		"# Here put the files that are needed to compile, except the program file",
-		"# which should be in a 'src' folder",
-		"dependencies:",
-		"\tmkdir -p obj",
-		"\t$(FC) -c src/SOMEFILE.f90",
-		"\t$(FC) -c src/OTHERFILE.f",
-		"\tmv *.o obj/",
-
-		"# Here goes the main program file",
-		"# which should be in an 'app' folder",
-		"all: dependencies",
-		"\t$(FC) -o executable.exe ./app/MAIN_PROGRAM_FILE.for obj/* -qmkl",
-		"",
-
-		"clean:",
-		"\trm obj/*"
+			"# Makefile for legact Fortran project",
+			"# Replace the files names with CAPS (and their extension) with your files",
+			"FC=ifort -g -extend-source",
+			"# Here put the files that are needed to compile, except the program file",
+			"# which should be in a 'src' folder",
+			"dependencies:",
+			"\tmkdir -p obj",
+			"\t$(FC) -c src/SOMEFILE.f90",
+			"\t$(FC) -c src/OTHERFILE.f",
+			"\tmv *.o obj/",
+			"# Here goes the main program file",
+			"# which should be in an 'app' folder",
+			"all: dependencies",
+			"\t$(FC) -o executable.exe ./app/MAIN_PROGRAM_FILE.for obj/* -qmkl",
+			"",
+			"clean:",
+			"\trm obj/*"
 		]
 	}
-
 }

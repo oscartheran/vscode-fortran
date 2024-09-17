@@ -3,20 +3,28 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
+    {
+      "label": "Set Environment",
+      "type":"shell",
+      "command": "export FPM_FC=gfortran",
+    },
     { "label": "fpm: install",
       "type": "shell",
       "command": "fpm",
       "args": [
         "install",
+        "--compiler", "gfortran",
+        "--c-compiler", "gcc",
         "--profile",
         "debug",
         "--prefix",
-        "${workspaceRoot}/build/vscode"
+        "${workspaceRoot}/build/vscode",
       ],
       "group": {
         "kind": "build",
         "isDefault": true
-      }
+      },
+      // "dependsOn": ["Setup OneAPI"]
     },
     { "label": "fpm: install example",
       "type": "shell",
