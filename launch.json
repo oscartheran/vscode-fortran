@@ -34,14 +34,13 @@
       "args": [],
       "stopAtEntry": true,
       "cwd": "${workspaceFolder}",
-      "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",
           "text": "-enable-pretty-printing",
-          "ignoreFailures": true
+          "ignoreFailures": true,
         },
         {
           "description": "Set Disassembly Flavor to Intel",
@@ -101,8 +100,7 @@
       ],
       "preLaunchTask": "fpm: test Single File"
     },
-    {
-      "name": "Debug Legacy",
+    { "name": "Debug Legacy",
       "type": "cppdbg",
       "request": "launch",
       // Executable name here:
